@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Pattern Stitch Tracker</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Base Styles */
+    body {
+      background-image: url(knitted-green.jpg); 
+      background-size: 100%; 
+      background-attachment: fixed; 
+      color: white; 
+      font-family: 'Poppins', sans-serif; 
+      text-align: center; 
+      margin: 0;
+      padding: 30px 20px;
+    }
+
+    .container {
+      background-color: rgba(30, 50, 52, 0.9); 
+      backdrop-filter: blur(6px); 
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 1050px; 
+      width: 95vw;
+      margin: auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh; 
+      box-sizing: border-box;
+    }
+
+    h2, h3 {
+      font-weight: 700; 
+    }
+
+    .num {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+    }
+
+    /* Form Elements */
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem; 
+      color: white; 
+      border: 1px solid rgba(255, 255, 255, 0.15); 
+      border-radius: 6px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.2); 
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    textarea { height: 120px; resize: vertical; }
+
+    /* Polished global buttons with lift and shadow effects */
+    button {
+      font-family: 'Poppins', sans-serif;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    button:hover { 
+      background-color: #45a049; 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    button.minus { background-color: #d9534f; }
+    button.minus:hover { background-color: #c9302c; }
+    
+    button.secondary { background-color: #5bc0de; font-size: 1rem; padding: 10px 18px; }
+    button.secondary:hover { background-color: #31b0d5; }
+
+    /* Setup UI */
+    #setup-ui { display: flex; flex-direction: column; height: 100%; overflow: hidden; text-align: left; }
+    .setup-scroll-area { flex-grow: 1; overflow-y: auto; padding-right: 15px; margin-bottom: 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
+    .section-input-block { background: rgba(0, 0, 0, 0.25); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+    .setup-actions { flex-shrink: 0; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); text-align: center; }
+
+    /* Tracker UI Layout */
+    #tracker-ui { display: none; flex-direction: row; height: 100%; overflow: hidden; gap: 20px; }
+
+    .sidebar { width: 250px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px; transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease; overflow-y: auto; text-align: left; }
+    .sidebar.collapsed { width: 0; padding: 0; margin: 0; border: none; opacity: 0; overflow: hidden; }
+
+    .sidebar-actions { display: flex; gap: 8px; width: 100%; }
+    
+    .sidebar-btn { 
+      flex: 1;
+      padding: 6px 4px; 
+      font-size: 0.8rem; 
+      font-weight: 400;
+      border-radius: 6px; 
+      color: white; 
+      border: 1px solid rgba(255,255,255,0.3); 
+      cursor: pointer; 
+      background: rgba(255,255,255,0.15); 
+      transition: all 0.2s ease; 
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .sidebar-btn:hover { 
+      background: rgba(255,255,255,0.3); 
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .sidebar-btn.danger { background: rgba(217, 83, 79, 0.8); border-color: transparent; }
+    .sidebar-btn.danger:hover { background: rgba(217, 83, 79, 1); }
+
+    .sidebar-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-size: 1.05rem; transition: background 0.2s;}
+    .sidebar-item:hover { background: rgba(255, 255, 255, 0.15); }
+    .sidebar-item.active { background: #4CAF50; font-weight: 600; }
+    .sidebar-item.completed { border-left: 4px solid #81c784; }
+
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+
+    .toggle-sidebar-btn { background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.9rem; min-width: 35px; box-shadow: none; transform: none;}
+    .toggle-sidebar-btn:hover { box-shadow: none; transform: none; background: rgba(255,255,255,0.3); }
+
+    .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
+
+    /* Accordion Row Styling */
+    .row-block { background: rgba(0, 0, 0, 0.2); border-radius: 8px; margin-bottom: 15px; border: 1px solid transparent; overflow: hidden; transition: border-color 0.3s, background 0.3s; }
+    .row-block.active-row { border: 1px solid rgba(255, 215, 0, 0.5); background: rgba(0, 0, 0, 0.4); }
+    
+    .row-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; cursor: pointer; background: rgba(255, 255, 255, 0.05); transition: background 0.2s; user-select: none; }
+    .row-header:hover { background: rgba(255, 255, 255, 0.1); }
+    
+    .title-group { display: flex; align-items: center; gap: 10px; }
+    .toggle-icon { font-size: 0.9rem; transition: transform 0.3s ease; opacity: 0.8; }
+    .row-block.collapsed .toggle-icon { transform: rotate(-90deg); }
+    .row-title { margin: 0; font-size: 1.2rem; color: #e0e0e0; }
+
+    .status-badge { font-size: 0.9rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background: transparent; color: transparent; }
+    .row-block.completed-row .status-badge { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+    .row-block.active-row .status-badge { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+
+    /* Stitches Grid */
+    .stitch-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, minmax(200px, 1fr)); 
+      gap: 16px; 
+      padding: 15px 25px 15px 25px; 
+    }
+    .row-block.collapsed .stitch-grid { display: none; }
+
+    /* Dynamic Spanning Classes */
+    .span-1 { grid-column: span 1; }
+    .span-2 { grid-column: span 2; }
+
+    /* Prevent grid blowouts on narrower screens */
+    @media (max-width: 800px) { 
+      .stitch-grid { grid-template-columns: 1fr; } 
+      .span-2 { grid-column: span 1; } 
+    }
+
+    /* Merged Group Container */
+    .stitch-group {
+      display: flex;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      border: 2px solid transparent;
+      box-sizing: border-box;
+    }
+    
+    .stitch-group.has-active {
+      transform: scale(1.05); 
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); 
+      z-index: 2; 
+      position: relative;
+    }
+
+    /* Pill Styling inside groups */
+    .stitch-pill { 
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: left;
+      font-size: 1rem; 
+      padding: 8px 14px; 
+      background: var(--pill-bg, rgba(255,255,255,0.15)); 
+      color: var(--pill-text, #e0e0e0); 
+      cursor: pointer; 
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      border: none;
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 28px; 
+      text-align: left;
+      opacity: 0.7;
+      margin-right: 2px;
+      flex-shrink: 0;
+    }
+
+    .stitch-pill.position-solo { border-radius: 18px; }
+    .stitch-pill.position-start { border-radius: 18px 0 0 18px; border-right: 2px solid rgba(0,0,0,0.25); }
+    .stitch-pill.position-middle { border-radius: 0; border-right: 2px solid rgba(0,0,0,0.25); }
+    .stitch-pill.position-end { border-radius: 0 18px 18px 0; }
+
+    .stitch-pill:hover { filter: brightness(1.15); }
+    
+    .stitch-pill.completed { 
+      opacity: 0.3 !important; 
+    }
+    
+    .stitch-pill.active { 
+      font-weight: 700; 
+      filter: brightness(1.15);
+      opacity: 1; 
+    }
+
+    .controls-container { 
+      flex-shrink: 0; 
+      background: rgba(30, 50, 52, 0.95); 
+      padding: 15px; 
+      border-top: 1px solid rgba(255,255,255,0.2); 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .controls-container button {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- SETUP UI -->
+    <div id="setup-ui">
+      <div class="setup-scroll-area">
+        <h2 style="text-align: center; font-size: 2rem;">Pattern Setup</h2>
+        <label>Pattern Name:</label>
+        <input type="text" id="patternTitle" placeholder="e.g., Tutter the Mouse" />
+        <div id="sections-container">
+          <div class="section-input-block">
+            <label>Section 1 Name:</label>
+            <input type="text" class="section-name-input" placeholder="e.g., Ears (x2) - start with light blue" />
+            <label>Section 1 Rows:</label>
+            <textarea class="section-rows-input" placeholder="Row 1: Magic Circle / 6sc (6)&#10;Row 2: 6inc (12)..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="setup-actions">
+        <button class="secondary" onclick="addSectionInput()">+ Add Another Section</button>
+        <button onclick="startPattern()" style="margin-left: 15px;">Start Pattern ➔</button>
+      </div>
+    </div>
+
+    <!-- TRACKER UI -->
+    <div id="tracker-ui">
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div style="display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px;">
+          <h3 id="displayPatternTitle" style="font-size: 1.4rem; margin: 0; line-height: 1.2;">Pattern</h3>
+          <div class="sidebar-actions">
+            <button class="sidebar-btn" onclick="undoAction()">↶ Undo</button>
+            <button class="sidebar-btn" onclick="editPattern()">✎ Edit</button>
+            <button class="sidebar-btn danger" onclick="clearProgress()">✖ Reset</button>
+          </div>
+        </div>
+        <div id="sidebarList"></div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="header-bar">
+          <div class="header-left">
+            <button id="sidebarToggle" class="toggle-sidebar-btn" onclick="toggleSidebar()">◀</button>
+            <span id="displaySectionTitle" style="font-weight: 700;">Section</span>
+          </div>
+          <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+            <span style="font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px;">⏱ <span id="stitchTimer">0s</span></span>
+            <span style="font-size: 1.1rem; opacity: 0.8;">Current: <strong id="displayRow" class="num">Row 1</strong></span>
+          </div>
+        </div>
+
+        <div class="pattern-list" id="patternList"></div>
+
+        <div class="controls-container">
+          <button class="secondary minus" onclick="jumpRow(-1)">← Prev Row</button>
+          <button class="minus" onclick="changeStitch(-1)">Prev Step</button>
+          <button onclick="changeStitch(1)">Next Step</button>
+          <button class="secondary" onclick="jumpRow(1)">Next Row →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let appData = { title: "", sections: [] };
+    let rawInputs = { title: "", sections: [] }; 
+    let currentSectionIndex = 0;
+    let currentRowIndex = 0;
+    let currentStepIndex = 0;
+    let lastActiveRowIndex = 0;
+
+    // Timer, Audio & Cooldowns
+    let lastStitchTime = Date.now();
+    let lastActionTime = 0;
+    const ACTION_COOLDOWN = 300; // 300 milliseconds debounce cooldown
+
+    const sfxNext = new Audio('next-sfx.mp3');
+    const sfxPrev = new Audio('prev-sfx.mp3');
+
+    // Undo Engine Stack
+    let undoStack = [];
+
+    function playSound(type) {
+      try {
+        if (type === 'next') {
+          sfxNext.currentTime = 0;
+          sfxNext.play();
+        } else if (type === 'prev') {
+          sfxPrev.currentTime = 0;
+          sfxPrev.play();
+        }
+      } catch(e) {
+        console.log('Audio playback issue:', e);
+      }
+    }
+
+    function resetTimer() {
+      lastStitchTime = Date.now();
+    }
+
+    setInterval(() => {
+      let diff = Math.floor((Date.now() - lastStitchTime) / 1000);
+      let m = Math.floor(diff / 60);
+      let s = diff % 60;
+      let timeString = m > 0 ? `${m}m ${s}s` : `${s}s`;
+      let timerEl = document.getElementById('stitchTimer');
+      if (timerEl) timerEl.innerText = timeString;
+    }, 1000);
+
+    const stitchDefinitions = { 
+      'inc': ['Increase (1st st)', 'Increase (2nd st)'], 'dec': ['Decrease (1st loop)', 'Decrease (2nd loop)'], 
+      'sc': ['Single Crochet'], 'slst': ['Slip Stitch'], 'sl st': ['Slip Stitch'], 
+      'ch': ['Chain'], 'magic circle': ['Magic Circle Setup'], 'dc': ['Double Crochet'], 'hdc': ['Half Double Crochet']
+    };
+
+    const abbreviationMap = {
+      'slst': 'Slip Stitch',
+      'sl st': 'Slip Stitch',
+      'sc': 'Single Crochet',
+      'hdc': 'Half Double Crochet',
+      'dc': 'Double Crochet',
+      'inc': 'Increase',
+      'dec': 'Decrease',
+      'ch': 'Chain',
+      'st': 'stitch',
+      'sts': 'stitches',
+      'fo': 'Fasten Off',
+      'rnd': 'round',
+      'rnds': 'rounds',
+      'rep': 'repeat'
+    };
+
+    // --- STATE & UNDO MANAGEMENT ---
+    function saveForUndo() {
+      if (appData.sections.length === 0) return;
+      const sectionsCompleted = appData.sections.map(s => s.isCompleted);
+      
+      undoStack.push({
+        section: currentSectionIndex,
+        row: currentRowIndex,
+        step: currentStepIndex,
+        completions: sectionsCompleted
+      });
+
+      if (undoStack.length > 50) undoStack.shift(); 
+    }
+
+    function undoAction() {
+      const now = Date.now();
+      if (now - lastActionTime < ACTION_COOLDOWN) return;
+      lastActionTime = now;
+
+      if (undoStack.length > 0) {
+        const prevState = undoStack.pop();
+        
+        currentSectionIndex = prevState.section;
+        currentRowIndex = prevState.row;
+        currentStepIndex = prevState.step;
+        
+        appData.sections.forEach((sec, i) => {
+            sec.isCompleted = prevState.completions[i];
+        });
+
+        playSound('prev'); 
+        resetTimer();
+
+        renderSidebar();
+        renderPatternList();
+        updateFocus();
+      }
+    }
+
+    function saveState() {
+      if (appData.sections.length === 0) return; 
+      
+      if(appData.sections[currentSectionIndex]) {
+        appData.sections[currentSectionIndex].savedRow = currentRowIndex;
+        appData.sections[currentSectionIndex].savedStep = currentStepIndex;
+      }
+
+      const state = {
+        appData: appData,
+        rawInputs: rawInputs,
+        currentSectionIndex: currentSectionIndex,
+        currentRowIndex: currentRowIndex,
+        currentStepIndex: currentStepIndex,
+        lastStitchTime: lastStitchTime
+      };
+      localStorage.setItem('crochetTrackerProgress', JSON.stringify(state));
+    }
+
+    function loadState() {
+      const savedData = localStorage.getItem('crochetTrackerProgress');
+      if (savedData) {
+        try {
+          const state = JSON.parse(savedData);
+          appData = state.appData;
+          rawInputs = state.rawInputs;
+          currentSectionIndex = state.currentSectionIndex;
+          currentRowIndex = state.currentRowIndex;
+          currentStepIndex = state.currentStepIndex;
+          lastStitchTime = state.lastStitchTime || Date.now();
+          
+          document.getElementById('patternTitle').value = rawInputs.title;
+          const container = document.getElementById('sections-container');
+          container.innerHTML = '';
+          rawInputs.sections.forEach((sec, i) => {
+            const block = document.createElement('div');
+            block.className = 'section-input-block';
+            block.innerHTML = `<label>Section ${i + 1} Name:</label><input type="text" class="section-name-input" /><label>Section ${i + 1} Rows:</label><textarea class="section-rows-input"></textarea>`;
+            block.querySelector('.section-name-input').value = sec.name;
+            block.querySelector('.section-rows-input').value = sec.rows;
+            container.appendChild(block);
+          });
+
+          document.getElementById('setup-ui').style.display = 'none';
+          document.getElementById('tracker-ui').style.display = 'flex';
+          document.getElementById('displayPatternTitle').innerText = appData.title;
+          
+          loadSection(currentSectionIndex);
+        } catch (e) {
+          console.error("Failed to load saved state", e);
+        }
+      }
+    }
+
+    function clearProgress() {
+      if(confirm("Are you sure you want to completely clear your saved progress and start over?")) {
+        localStorage.removeItem('crochetTrackerProgress');
+        location.reload();
+      }
+    }
+
+    window.onload = loadState;
+
+    // --- COLOR HELPERS ---
+    function getColorHex(colorName) {
+      let c = colorName.toLowerCase();
+      if (c.includes('light blue') || c.includes('blue')) return '#7abceb';
+      if (c.includes('pink')) return '#ffb6c1';
+      if (c.includes('white')) return '#f8f9fa';
+      if (c.includes('black')) return '#444444';
+      if (c.includes('grey') || c.includes('gray')) return '#aaaaaa';
+      if (c.includes('red')) return '#d9534f';
+      if (c.includes('green')) return '#5cb85c';
+      if (c.includes('yellow')) return '#f0ad4e';
+      return 'rgba(255,255,255,0.15)'; // Default
+    }
+
+    function getTextColor(hex) {
+      if (hex === 'rgba(255,255,255,0.15)') return '#e0e0e0';
+      if (['#f8f9fa', '#ffb6c1', '#7abceb', '#f0ad4e'].includes(hex)) return '#1a1a1a';
+      return 'white';
+    }
+
+    // --- SETUP LOGIC ---
+    function addSectionInput() {
+      const container = document.getElementById('sections-container');
+      const count = container.children.length + 1;
+      const block = document.createElement('div');
+      block.className = 'section-input-block';
+      block.innerHTML = `<label>Section ${count} Name:</label><input type="text" class="section-name-input" /><label>Section ${count} Rows:</label><textarea class="section-rows-input"></textarea>`;
+      container.appendChild(block);
+    }
+
+    function editPattern() {
+      document.getElementById('tracker-ui').style.display = 'none';
+      document.getElementById('setup-ui').style.display = 'flex';
+    }
+
+    function startPattern() {
+      appData.title = document.getElementById('patternTitle').value || "My Pattern";
+      appData.sections = [];
+      rawInputs.title = document.getElementById('patternTitle').value;
+      rawInputs.sections = [];
+      undoStack = []; // Wipe history on restart
+      
+      document.querySelectorAll('.section-input-block').forEach((block, i) => {
+        const rawName = block.querySelector('.section-name-input').value || `Section ${i + 1}`;
+        const rowsText = block.querySelector('.section-rows-input').value;
+        
+        rawInputs.sections.push({ name: rawName, rows: rowsText });
+
+        let match = rawName.match(/\([xX](\d+)\)|\((\d+)[xX]\)/);
+        let copies = match ? parseInt(match[1] || match[2], 10) : 1;
+
+        for (let c = 1; c <= copies; c++) {
+          let sectionName = rawName;
+          if (copies > 1) {
+            sectionName = rawName.replace(/\([xX]\d+\)|\(\d+[xX]\)/, `(${c})`);
+          }
+
+          let defaultColor = 'default';
+          let lowerName = rawName.toLowerCase();
+          
+          if (lowerName.includes('light blue') || lowerName.includes('blue')) defaultColor = 'light blue';
+          else if (lowerName.includes('pink')) defaultColor = 'pink';
+          else if (lowerName.includes('white')) defaultColor = 'white';
+
+          let nameParts = sectionName.split('-');
+          if (nameParts.length > 1) {
+             let lastPart = nameParts[nameParts.length - 1].toLowerCase();
+             if (['blue', 'pink', 'white', 'black', 'grey', 'gray', 'red', 'green', 'yellow', 'light'].some(color => lastPart.includes(color))) {
+                 nameParts.pop(); 
+                 sectionName = nameParts.join('-').trim();
+             }
+          }
+
+          const rows = parsePatternText(rowsText, defaultColor);
+          
+          if (rows.length > 0) {
+            appData.sections.push({ 
+              name: sectionName, 
+              rows: JSON.parse(JSON.stringify(rows)), 
+              savedRow: 0, 
+              savedStep: 0, 
+              isCompleted: false 
+            });
+          }
+        }
+      });
+      
+      if (appData.sections.length === 0) return alert("No valid rows found.");
+      
+      document.getElementById('setup-ui').style.display = 'none';
+      document.getElementById('tracker-ui').style.display = 'flex';
+      document.getElementById('displayPatternTitle').innerText = appData.title;
+      
+      resetTimer();
+      loadSection(0);
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebarToggle');
+      sidebar.classList.toggle('collapsed');
+      btn.innerText = sidebar.classList.contains('collapsed') ? "▶" : "◀";
+    }
+
+    // --- PARSER LOGIC ---
+    function parsePatternText(text, defaultColor) {
+      let rows = [];
+      text.split('\n').forEach(line => {
+        let match = line.trim().match(/^Row\s+(\d+)(?:-(\d+))?:\s*(.*)/i);
+        if (match) {
+          let start = parseInt(match[1]), end = match[2] ? parseInt(match[2]) : start;
+          let instructions = match[3];
+
+          let rowTotal = 1;
+          let totalRegex = /\s*\(\s*(\d+)\s*\)/g;
+          let tMatch;
+          let lastMatch = null;
+          while ((tMatch = totalRegex.exec(instructions)) !== null) {
+            lastMatch = tMatch;
+          }
+          if (lastMatch) {
+            rowTotal = parseInt(lastMatch[1], 10);
+            instructions = instructions.substring(0, lastMatch.index) + instructions.substring(lastMatch.index + lastMatch[0].length);
+          }
+
+          let steps = parseInstructions(instructions.trim(), rowTotal, defaultColor);
+          for (let r = start; r <= end; r++) rows.push({ name: `Row ${r}`, steps: [...steps] });
+        }
+      });
+      return rows;
+    }
+
+    function parseInstructions(inst, rowTotal, defaultColor) {
+      let seq = [];
+      let currentColor = defaultColor;
+
+      let expandedInst = inst.replace(/\((.*?)\)\s*[x\*]\s*(\d+)/gi, (_, group, m) => { 
+        let arr = [];
+        for(let i=0; i<parseInt(m); i++) arr.push(group); 
+        return arr.join(' / '); 
+      });
+
+      let parts = expandedInst.split(/\s*\/\s*(?![^()]*\))/g);
+      
+      parts.forEach(part => {
+        part = part.trim();
+        if (!part) return;
+
+        let switchMatch = part.match(/\(switch to ([a-zA-Z\s]+)\)/i);
+        let nextColor = null;
+        if (switchMatch) {
+          nextColor = switchMatch[1].toLowerCase().trim();
+          part = part.replace(switchMatch[0], '').trim(); 
+        }
+
+        let subSeq = [];
+        
+        if (part.toLowerCase().includes("entire row")) {
+          let splits = part.split(/entire row/i);
+          let type = splits[0].trim().toLowerCase();
+          
+          let limit = (rowTotal && rowTotal > 1) ? rowTotal : 1; 
+          for(let i=0; i<limit; i++) subSeq.push(type);
+          
+          if (splits.length > 1) {
+            let remainder = splits[1].trim();
+            if (remainder.toLowerCase().startsWith('and ')) {
+              remainder = remainder.substring(4).trim();
+            } else if (remainder.startsWith(',') || remainder.startsWith('-')) {
+              remainder = remainder.substring(1).trim();
+            }
+            if (remainder) {
+              subSeq.push(remainder);
+            }
+          }
+        } else {
+          let isStitch = false;
+          let count = 0;
+          let stitchName = "";
+
+          let m1 = part.match(/^(\d+)\s*([a-z\s]+)$/i); 
+          let m2 = part.match(/^([a-z\s]+?)\s+(\d+)$/i); 
+          let m3 = part.match(/^([a-z]+)(\d+)$/i); 
+
+          if (m1) { count = parseInt(m1[1]); stitchName = m1[2].trim(); isStitch = true; }
+          else if (m2) { count = parseInt(m2[2]); stitchName = m2[1].trim(); isStitch = true; }
+          else if (m3) { count = parseInt(m3[2]); stitchName = m3[1].trim(); isStitch = true; }
+
+          let cleanSt = stitchName.toLowerCase().replace(/[^a-z ]/g, '').trim();
+          let isKnown = stitchDefinitions[cleanSt] !== undefined;
+          let isSingleWord = !stitchName.includes(' ') && stitchName.length <= 5 && stitchName.toLowerCase() !== 'row';
+
+          if (isStitch && (isKnown || isSingleWord)) {
+            for(let i=0; i<count; i++) subSeq.push(stitchName);
+          } else if (part.toLowerCase() === 'magic circle') {
+            subSeq.push('magic circle');
+          } else {
+            subSeq.push(part); 
+          }
+        }
+
+        let expandedSub = expandToSubsteps(subSeq);
+        
+        expandedSub.forEach(st => seq.push({ 
+          text: st.baseText, 
+          color: currentColor, 
+          position: st.position, 
+          groupSize: st.groupSize 
+        }));
+        
+        if (nextColor) { currentColor = nextColor; }
+      });
+      
+      return seq;
+    }
+
+    function expandToSubsteps(sequence) {
+      let final = [];
+      sequence.forEach(s => { 
+        let c = s.toLowerCase().replace(/[^a-z ]/g, '').trim(); 
+        let substeps = stitchDefinitions[c]; 
+
+        if (substeps) {
+          substeps.forEach((sub, idx) => {
+            let pos = 'solo';
+            if (substeps.length > 1) {
+              pos = (idx === 0) ? 'start' : (idx === substeps.length - 1) ? 'end' : 'middle';
+            }
+            final.push({ baseText: sub, position: pos, groupSize: substeps.length });
+          });
+        } else {
+          let translatedText = s;
+          Object.keys(abbreviationMap).forEach(abbr => {
+             let regex = new RegExp('\\b' + abbr + '\\b', 'gi');
+             translatedText = translatedText.replace(regex, abbreviationMap[abbr]);
+          });
+          
+          translatedText = translatedText.charAt(0).toUpperCase() + translatedText.slice(1);
+          final.push({ baseText: translatedText, position: 'solo', groupSize: 1 });
+        }
+      });
+      return final;
+    }
+
+    // --- RENDER LOGIC ---
+    function loadSection(index) {
+      if (appData.sections[currentSectionIndex]) {
+        appData.sections[currentSectionIndex].savedRow = currentRowIndex;
+        appData.sections[currentSectionIndex].savedStep = currentStepIndex;
+      }
+
+      currentSectionIndex = index;
+      const sec = appData.sections[index];
+      
+      currentRowIndex = sec.savedRow;
+      currentStepIndex = sec.savedStep;
+      lastActiveRowIndex = currentRowIndex;
+
+      document.getElementById('displaySectionTitle').innerText = sec.name;
+      
+      renderSidebar();
+      renderPatternList();
+      updateFocus();
+    }
+
+    function renderSidebar() {
+      const list = document.getElementById('sidebarList');
+      list.innerHTML = '';
+      appData.sections.forEach((sec, i) => {
+        const item = document.createElement('div');
+        item.className = `sidebar-item ${i === currentSectionIndex ? 'active' : ''} ${sec.isCompleted ? 'completed' : ''}`;
+        item.innerHTML = `<span>${sec.name}</span>${sec.isCompleted ? '<span style="font-size: 0.85rem; color: #81c784;">✓ Done</span>' : ''}`;
+        item.onclick = () => loadSection(i);
+        list.appendChild(item);
+      });
+    }
+
+    function renderPatternList() {
+      const listContainer = document.getElementById('patternList');
+      listContainer.innerHTML = ''; 
+
+      appData.sections[currentSectionIndex].rows.forEach((row, rIndex) => {
+        const rowBlock = document.createElement('div');
+        rowBlock.className = 'row-block';
+        rowBlock.id = `row-block-${rIndex}`;
+        
+        if (rIndex !== currentRowIndex) rowBlock.classList.add('collapsed');
+
+        const header = document.createElement('div');
+        header.className = 'row-header';
+        header.onclick = () => rowBlock.classList.toggle('collapsed');
+
+        const titleGroup = document.createElement('div');
+        titleGroup.className = 'title-group';
+
+        const toggleIcon = document.createElement('span');
+        toggleIcon.className = 'toggle-icon';
+        toggleIcon.innerText = '▼';
+
+        const title = document.createElement('h3');
+        title.className = 'row-title num';
+        title.innerText = `${row.name} (${row.steps.length} steps)`;
+
+        titleGroup.appendChild(toggleIcon);
+        titleGroup.appendChild(title);
+
+        const statusBadge = document.createElement('span');
+        statusBadge.className = 'status-badge';
+        statusBadge.id = `status-${rIndex}`;
+
+        header.appendChild(titleGroup);
+        header.appendChild(statusBadge);
+        rowBlock.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.className = 'stitch-grid';
+
+        let currentGroupDiv = null;
+
+        row.steps.forEach((stepObj, sIndex) => {
+          if (stepObj.position === 'solo' || stepObj.position === 'start') {
+            currentGroupDiv = document.createElement('div');
+            
+            let groupSpan = 0;
+            for (let i = 0; i < stepObj.groupSize; i++) {
+              let aheadStep = row.steps[sIndex + i];
+              if (aheadStep && aheadStep.text) {
+                let len = aheadStep.text.length;
+                if (len >= 18) groupSpan += 2;
+                else groupSpan += 1;
+              }
+            }
+            groupSpan = Math.min(groupSpan, 2); 
+
+            currentGroupDiv.className = `stitch-group span-${groupSpan}`;
+            grid.appendChild(currentGroupDiv);
+          }
+
+          const pill = document.createElement('div');
+          pill.className = `stitch-pill position-${stepObj.position}`;
+          pill.setAttribute('data-row', rIndex);
+          pill.setAttribute('data-step', sIndex);
+          
+          let colorHex = getColorHex(stepObj.color);
+          pill.style.setProperty('--pill-bg', colorHex);
+          pill.style.setProperty('--pill-text', getTextColor(colorHex));
+
+          const stepNum = document.createElement('span');
+          stepNum.className = 'num step-number';
+          stepNum.innerText = `${sIndex + 1}.`;
+
+          pill.appendChild(stepNum);
+          pill.appendChild(document.createTextNode(stepObj.text));
+          
+          pill.onclick = (e) => {
+            e.stopPropagation(); 
+            const now = Date.now();
+            if (now - lastActionTime < ACTION_COOLDOWN) return;
+            lastActionTime = now;
+
+            saveForUndo(); 
+            
+            uncompleteCurrentSection(); 
+            playSound('next');
+            resetTimer();
+
+            currentRowIndex = rIndex;
+            currentStepIndex = sIndex;
+            updateFocus();
+          };
+
+          currentGroupDiv.appendChild(pill);
+        });
+
+        rowBlock.appendChild(grid);
+        listContainer.appendChild(rowBlock);
+      });
+    }
+
+    function updateFocus() {
+      const sec = appData.sections[currentSectionIndex];
+      document.getElementById('displayRow').innerText = sec.rows[currentRowIndex].name;
+
+      if (lastActiveRowIndex !== currentRowIndex) {
+        const oldBlock = document.getElementById(`row-block-${lastActiveRowIndex}`);
+        if (oldBlock) oldBlock.classList.add('collapsed');
+
+        const newBlock = document.getElementById(`row-block-${currentRowIndex}`);
+        if (newBlock) newBlock.classList.remove('collapsed');
+
+        lastActiveRowIndex = currentRowIndex;
+      }
+      
+      document.querySelectorAll('.stitch-group').forEach(g => g.classList.remove('has-active'));
+
+      document.querySelectorAll('.row-block').forEach((block, r) => {
+        const badge = document.getElementById(`status-${r}`);
+        block.classList.toggle('active-row', r === currentRowIndex);
+        block.classList.toggle('completed-row', r < currentRowIndex);
+        
+        badge.innerText = r < currentRowIndex ? "✓ Done" : (r === currentRowIndex ? "▶ Active" : "");
+
+        block.querySelectorAll('.stitch-pill').forEach((pill, s) => {
+          const posClass = Array.from(pill.classList).find(c => c.startsWith('position-'));
+          
+          pill.className = `stitch-pill ${posClass} ${r < currentRowIndex || (r === currentRowIndex && s < currentStepIndex) ? 'completed' : (r === currentRowIndex && s === currentStepIndex ? 'active' : '')}`;
+          
+          if (r === currentRowIndex && s === currentStepIndex) {
+             pill.closest('.stitch-group').classList.add('has-active');
+             pill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+      });
+      
+      saveState();
+    }
+
+    function uncompleteCurrentSection() {
+      const sec = appData.sections[currentSectionIndex];
+      if (sec.isCompleted) {
+        sec.isCompleted = false;
+        renderSidebar();
+      }
+    }
+
+    function changeStitch(dir) {
+      const now = Date.now();
+      if (now - lastActionTime < ACTION_COOLDOWN) return;
+      lastActionTime = now;
+
+      saveForUndo(); 
+
+      if (dir < 0) {
+        uncompleteCurrentSection();
+        playSound('prev');
+      } else {
+        playSound('next');
+      }
+      resetTimer();
+
+      currentStepIndex += dir;
+      const sec = appData.sections[currentSectionIndex];
+      let currentRow = sec.rows[currentRowIndex];
+
+      if (currentStepIndex >= currentRow.steps.length) {
+        if (currentRowIndex < sec.rows.length - 1) {
+          currentRowIndex++;
+          currentStepIndex = 0;
+        } else {
+          currentStepIndex = currentRow.steps.length - 1; 
+          sec.isCompleted = true;
+          renderSidebar();
+          
+          if (currentSectionIndex < appData.sections.length - 1) {
+             if(confirm("Section complete! Move to the next section?")) {
+               loadSection(currentSectionIndex + 1);
+               return; 
+             }
+          } else {
+             alert("You've finished the entire pattern!");
+          }
+        }
+      } 
+      else if (currentStepIndex < 0) {
+        if (currentRowIndex > 0) {
+          currentRowIndex--;
+          currentStepIndex = sec.rows[currentRowIndex].steps.length - 1;
+        } else {
+          currentStepIndex = 0; 
+        }
+      }
+      updateFocus();
+    }
+
+    function jumpRow(dir) {
+      const now = Date.now();
+      if (now - lastActionTime < ACTION_COOLDOWN) return;
+      lastActionTime = now;
+
+      saveForUndo(); 
+
+      if (dir < 0) playSound('prev');
+      else playSound('next');
+      resetTimer();
+
+      uncompleteCurrentSection();
+      currentRowIndex += dir;
+      const sec = appData.sections[currentSectionIndex];
+      
+      if (currentRowIndex < 0) currentRowIndex = 0;
+      if (currentRowIndex >= sec.rows.length) currentRowIndex = sec.rows.length - 1;
+      
+      currentStepIndex = 0; 
+      updateFocus();
+    }
+
+    // --- KEYBOARD LISTENER ---
+    document.addEventListener('keydown', function(e) {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+      
+      const active = document.activeElement;
+      const isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT');
+
+      if (cmdOrCtrl && (e.key === 'a' || e.key === 'A')) {
+        if (isTyping) {
+          e.preventDefault();
+          active.select();
+        }
+      }
+
+      if (!isTyping && document.getElementById('tracker-ui').style.display === 'flex') {
+        if (e.key === 'ArrowLeft') {
+          changeStitch(-1);
+        } else if (e.key === 'ArrowRight') {
+          changeStitch(1);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
