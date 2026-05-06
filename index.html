@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1e3234">
+  
   <title>Full Pattern Stitch Tracker</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +16,7 @@
     /* Base Styles */
     body {
       background-image: url(knitted-green.jpg); 
-      background-size: 100%; 
+      background-size: cover; 
       background-attachment: fixed; 
       color: white; 
       font-family: 'Poppins', sans-serif; 
@@ -51,7 +54,8 @@
       width: 100%;
       padding: 12px;
       font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem; 
+      /* Exactly 16px prevents iOS from auto-zooming on focus */
+      font-size: 16px; 
       color: white; 
       border: 1px solid rgba(255, 255, 255, 0.15); 
       border-radius: 6px;
@@ -72,7 +76,7 @@
 
     textarea { height: 120px; resize: vertical; }
 
-    /* Polished global buttons with lift and shadow effects */
+    /* Polished global buttons */
     button {
       font-family: 'Poppins', sans-serif;
       background-color: #4CAF50;
@@ -112,9 +116,9 @@
     .setup-actions { flex-shrink: 0; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); text-align: center; }
 
     /* Tracker UI Layout */
-    #tracker-ui { display: none; flex-direction: row; height: 100%; overflow: hidden; gap: 20px; }
+    #tracker-ui { display: none; flex-direction: row; height: 100%; overflow: hidden; gap: 20px; position: relative; }
 
-    .sidebar { width: 250px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px; transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease; overflow-y: auto; text-align: left; }
+    .sidebar { width: 250px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px; transition: all 0.3s ease; overflow-y: auto; text-align: left; z-index: 100;}
     .sidebar.collapsed { width: 0; padding: 0; margin: 0; border: none; opacity: 0; overflow: hidden; }
 
     .sidebar-actions { display: flex; gap: 8px; width: 100%; }
@@ -181,15 +185,8 @@
     }
     .row-block.collapsed .stitch-grid { display: none; }
 
-    /* Dynamic Spanning Classes */
     .span-1 { grid-column: span 1; }
     .span-2 { grid-column: span 2; }
-
-    /* Prevent grid blowouts on narrower screens */
-    @media (max-width: 800px) { 
-      .stitch-grid { grid-template-columns: 1fr; } 
-      .span-2 { grid-column: span 1; } 
-    }
 
     /* Merged Group Container */
     .stitch-group {
@@ -209,7 +206,6 @@
       position: relative;
     }
 
-    /* Pill Styling inside groups */
     .stitch-pill { 
       display: flex;
       flex: 1;
@@ -241,16 +237,8 @@
     .stitch-pill.position-end { border-radius: 0 18px 18px 0; }
 
     .stitch-pill:hover { filter: brightness(1.15); }
-    
-    .stitch-pill.completed { 
-      opacity: 0.3 !important; 
-    }
-    
-    .stitch-pill.active { 
-      font-weight: 700; 
-      filter: brightness(1.15);
-      opacity: 1; 
-    }
+    .stitch-pill.completed { opacity: 0.3 !important; }
+    .stitch-pill.active { font-weight: 700; filter: brightness(1.15); opacity: 1; }
 
     .controls-container { 
       flex-shrink: 0; 
@@ -266,15 +254,64 @@
     .controls-container button {
       margin: 0;
     }
+
+    /* --- MOBILE APP OVERRIDES --- */
+    @media (max-width: 800px) { 
+      body { padding: 0; }
+      
+      .container { 
+        max-width: 100%; 
+        width: 100vw; 
+        height: 100vh; 
+        max-height: 100vh; 
+        border-radius: 0; 
+        padding: 12px; 
+      }
+      
+      .stitch-grid { grid-template-columns: 1fr; } 
+      .span-2 { grid-column: span 1; } 
+
+      /* Sidebar turns into an off-canvas drawer */
+      .sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: rgb(25, 45, 47); /* Solid background blocks content */
+        box-shadow: 5px 0 20px rgba(0,0,0,0.7);
+        padding: 20px 15px;
+        z-index: 999;
+      }
+      
+      .header-bar { font-size: 1.1rem; flex-direction: column; align-items: flex-start; gap: 8px; }
+      .header-left { width: 100%; }
+
+      /* Chunky 2x2 grid for mobile controls */
+      .controls-container { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px; 
+        padding: 12px 0 0 0;
+      }
+      .controls-container button { 
+        width: 100%; 
+        font-size: 0.95rem; 
+        padding: 14px 8px; 
+      }
+      /* Push Step buttons to top row, Row buttons to bottom row */
+      .controls-container button:nth-child(1) { order: 3; } /* Prev Row */
+      .controls-container button:nth-child(2) { order: 1; } /* Prev Step */
+      .controls-container button:nth-child(3) { order: 2; } /* Next Step */
+      .controls-container button:nth-child(4) { order: 4; } /* Next Row */
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- SETUP UI -->
     <div id="setup-ui">
       <div class="setup-scroll-area">
-        <h2 style="text-align: center; font-size: 2rem;">Pattern Setup</h2>
+        <h2 style="text-align: center; font-size: 2rem; margin-top: 5px;">Pattern Setup</h2>
         <label>Pattern Name:</label>
         <input type="text" id="patternTitle" placeholder="e.g., Tutter the Mouse" />
         <div id="sections-container">
@@ -292,9 +329,7 @@
       </div>
     </div>
 
-    <!-- TRACKER UI -->
     <div id="tracker-ui">
-      <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
         <div style="display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px;">
           <h3 id="displayPatternTitle" style="font-size: 1.4rem; margin: 0; line-height: 1.2;">Pattern</h3>
@@ -307,7 +342,6 @@
         <div id="sidebarList"></div>
       </div>
 
-      <!-- Main Content -->
       <div class="main-content">
         <div class="header-bar">
           <div class="header-left">
@@ -316,7 +350,7 @@
           </div>
           <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
             <span style="font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px;">⏱ <span id="stitchTimer">0s</span></span>
-            <span style="font-size: 1.1rem; opacity: 0.8;">Current: <strong id="displayRow" class="num">Row 1</strong></span>
+            <span style="font-size: 1rem; opacity: 0.8; text-align: right;">Current: <br><strong id="displayRow" class="num">Row 1</strong></span>
           </div>
         </div>
 
@@ -343,12 +377,10 @@
     // Timer, Audio & Cooldowns
     let lastStitchTime = Date.now();
     let lastActionTime = 0;
-    const ACTION_COOLDOWN = 300; // 300 milliseconds debounce cooldown
+    const ACTION_COOLDOWN = 300; 
 
     const sfxNext = new Audio('next-sfx.mp3');
     const sfxPrev = new Audio('prev-sfx.mp3');
-
-    // Undo Engine Stack
     let undoStack = [];
 
     function playSound(type) {
@@ -489,6 +521,10 @@
           document.getElementById('displayPatternTitle').innerText = appData.title;
           
           loadSection(currentSectionIndex);
+          
+          // If viewing on mobile on load, collapse the sidebar automatically
+          if (window.innerWidth <= 800) toggleSidebar('close');
+
         } catch (e) {
           console.error("Failed to load saved state", e);
         }
@@ -502,8 +538,6 @@
       }
     }
 
-    window.onload = loadState;
-
     // --- COLOR HELPERS ---
     function getColorHex(colorName) {
       let c = colorName.toLowerCase();
@@ -515,7 +549,7 @@
       if (c.includes('red')) return '#d9534f';
       if (c.includes('green')) return '#5cb85c';
       if (c.includes('yellow')) return '#f0ad4e';
-      return 'rgba(255,255,255,0.15)'; // Default
+      return 'rgba(255,255,255,0.15)'; 
     }
 
     function getTextColor(hex) {
@@ -599,12 +633,22 @@
       
       resetTimer();
       loadSection(0);
+      
+      if (window.innerWidth <= 800) toggleSidebar('close');
     }
 
-    function toggleSidebar() {
+    function toggleSidebar(forceState) {
       const sidebar = document.getElementById('sidebar');
       const btn = document.getElementById('sidebarToggle');
-      sidebar.classList.toggle('collapsed');
+      
+      if (forceState === 'close') {
+        sidebar.classList.add('collapsed');
+      } else if (forceState === 'open') {
+        sidebar.classList.remove('collapsed');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+      
       btn.innerText = sidebar.classList.contains('collapsed') ? "▶" : "◀";
     }
 
@@ -776,7 +820,11 @@
         const item = document.createElement('div');
         item.className = `sidebar-item ${i === currentSectionIndex ? 'active' : ''} ${sec.isCompleted ? 'completed' : ''}`;
         item.innerHTML = `<span>${sec.name}</span>${sec.isCompleted ? '<span style="font-size: 0.85rem; color: #81c784;">✓ Done</span>' : ''}`;
-        item.onclick = () => loadSection(i);
+        item.onclick = () => {
+            loadSection(i);
+            // Auto-close sidebar on mobile after making a selection
+            if (window.innerWidth <= 800) toggleSidebar('close');
+        };
         list.appendChild(item);
       });
     }
