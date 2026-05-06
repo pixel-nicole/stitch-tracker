@@ -38,24 +38,18 @@
       flex-direction: column;
       max-height: 90vh; 
       box-sizing: border-box;
+      position: relative;
     }
 
-    h2, h3 {
-      font-weight: 700; 
-    }
-
-    .num {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-    }
+    h2, h3 { font-weight: 700; }
+    .num { font-family: 'Poppins', sans-serif; font-weight: 600; }
 
     /* Form Elements */
     input[type="text"], textarea {
       width: 100%;
       padding: 12px;
       font-family: 'Poppins', sans-serif;
-      /* Exactly 16px prevents iOS from auto-zooming on focus */
-      font-size: 16px; 
+      font-size: 16px; /* Locks out mobile zoom */
       color: white; 
       border: 1px solid rgba(255, 255, 255, 0.15); 
       border-radius: 6px;
@@ -64,19 +58,11 @@
       background: rgba(0, 0, 0, 0.2); 
       transition: border-color 0.2s;
     }
-
-    input[type="text"]:focus, textarea:focus {
-      outline: none;
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
+    input[type="text"]:focus, textarea:focus { outline: none; border-color: rgba(255, 255, 255, 0.4); }
+    input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.5); }
     textarea { height: 120px; resize: vertical; }
 
-    /* Polished global buttons */
+    /* Buttons */
     button {
       font-family: 'Poppins', sans-serif;
       background-color: #4CAF50;
@@ -91,23 +77,10 @@
       transition: all 0.2s ease;
       box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
-
-    button:hover { 
-      background-color: #45a049; 
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    }
-
-    button:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
+    button:hover { background-color: #45a049; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+    button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     button.minus { background-color: #d9534f; }
     button.minus:hover { background-color: #c9302c; }
-    
-    button.secondary { background-color: #5bc0de; font-size: 1rem; padding: 10px 18px; }
-    button.secondary:hover { background-color: #31b0d5; }
 
     /* Setup UI */
     #setup-ui { display: flex; flex-direction: column; height: 100%; overflow: hidden; text-align: left; }
@@ -121,28 +94,24 @@
     .sidebar { width: 250px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px; transition: all 0.3s ease; overflow-y: auto; text-align: left; z-index: 100;}
     .sidebar.collapsed { width: 0; padding: 0; margin: 0; border: none; opacity: 0; overflow: hidden; }
 
+    /* Overlay for clicking out of the sidebar on mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(2px);
+      z-index: 90;
+    }
+
     .sidebar-actions { display: flex; gap: 8px; width: 100%; }
-    
     .sidebar-btn { 
-      flex: 1;
-      padding: 6px 4px; 
-      font-size: 0.8rem; 
-      font-weight: 400;
-      border-radius: 6px; 
-      color: white; 
-      border: 1px solid rgba(255,255,255,0.3); 
-      cursor: pointer; 
-      background: rgba(255,255,255,0.15); 
-      transition: all 0.2s ease; 
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 6px 4px; font-size: 0.8rem; font-weight: 400; border-radius: 6px; 
+      color: white; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; 
+      background: rgba(255,255,255,0.15); transition: all 0.2s ease; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .sidebar-btn:hover { 
-      background: rgba(255,255,255,0.3); 
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
+    .sidebar-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
     .sidebar-btn.danger { background: rgba(217, 83, 79, 0.8); border-color: transparent; }
     .sidebar-btn.danger:hover { background: rgba(217, 83, 79, 1); }
 
@@ -152,10 +121,24 @@
     .sidebar-item.completed { border-left: 4px solid #81c784; }
 
     .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-    .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; }
+    
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 1.5rem; }
     .header-left { display: flex; align-items: center; gap: 15px; }
+    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+    
+    .timer-text { font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;}
+    .current-row-text { font-size: 1.1rem; opacity: 0.8; }
 
-    .toggle-sidebar-btn { background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.9rem; min-width: 35px; box-shadow: none; transform: none;}
+    /* New Row Navigation Bar */
+    .row-nav-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    .mini-btn {
+      background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 12px; font-size: 0.9rem; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .mini-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
+
+    .toggle-sidebar-btn { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; padding: 5px 8px; cursor: pointer; min-width: 35px; box-shadow: none; transform: none; margin: 0;}
     .toggle-sidebar-btn:hover { box-shadow: none; transform: none; background: rgba(255,255,255,0.3); }
 
     .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
@@ -172,141 +155,55 @@
     .row-block.collapsed .toggle-icon { transform: rotate(-90deg); }
     .row-title { margin: 0; font-size: 1.2rem; color: #e0e0e0; }
 
-    .status-badge { font-size: 0.9rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background: transparent; color: transparent; }
+    .status-badge { display: flex; align-items: center; gap: 4px; font-size: 0.9rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background: transparent; color: transparent; }
     .row-block.completed-row .status-badge { background: rgba(76, 175, 80, 0.2); color: #81c784; }
     .row-block.active-row .status-badge { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
 
-    /* Stitches Grid */
-    .stitch-grid { 
-      display: grid; 
-      grid-template-columns: repeat(2, minmax(200px, 1fr)); 
-      gap: 16px; 
-      padding: 15px 25px 15px 25px; 
-    }
+    .stitch-grid { display: grid; grid-template-columns: repeat(2, minmax(200px, 1fr)); gap: 16px; padding: 15px 25px 15px 25px; }
     .row-block.collapsed .stitch-grid { display: none; }
-
     .span-1 { grid-column: span 1; }
     .span-2 { grid-column: span 2; }
 
-    /* Merged Group Container */
-    .stitch-group {
-      display: flex;
-      border-radius: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-      border: 2px solid transparent;
-      box-sizing: border-box;
-    }
-    
-    .stitch-group.has-active {
-      transform: scale(1.05); 
-      border-color: #ffd700;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); 
-      z-index: 2; 
-      position: relative;
-    }
+    .stitch-group { display: flex; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; border: 2px solid transparent; box-sizing: border-box; }
+    .stitch-group.has-active { transform: scale(1.05); border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); z-index: 2; position: relative; }
 
-    .stitch-pill { 
-      display: flex;
-      flex: 1;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: left;
-      font-size: 1rem; 
-      padding: 8px 14px; 
-      background: var(--pill-bg, rgba(255,255,255,0.15)); 
-      color: var(--pill-text, #e0e0e0); 
-      cursor: pointer; 
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-      border: none;
-    }
-
-    .step-number {
-      display: inline-block;
-      width: 28px; 
-      text-align: left;
-      opacity: 0.7;
-      margin-right: 2px;
-      flex-shrink: 0;
-    }
-
+    .stitch-pill { display: flex; flex: 1; align-items: center; justify-content: flex-start; text-align: left; font-size: 1rem; padding: 8px 14px; background: var(--pill-bg, rgba(255,255,255,0.15)); color: var(--pill-text, #e0e0e0); cursor: pointer; transition: all 0.3s ease; box-sizing: border-box; border: none; }
+    .step-number { display: inline-block; width: 28px; text-align: left; opacity: 0.7; margin-right: 2px; flex-shrink: 0; }
     .stitch-pill.position-solo { border-radius: 18px; }
     .stitch-pill.position-start { border-radius: 18px 0 0 18px; border-right: 2px solid rgba(0,0,0,0.25); }
     .stitch-pill.position-middle { border-radius: 0; border-right: 2px solid rgba(0,0,0,0.25); }
     .stitch-pill.position-end { border-radius: 0 18px 18px 0; }
-
     .stitch-pill:hover { filter: brightness(1.15); }
     .stitch-pill.completed { opacity: 0.3 !important; }
     .stitch-pill.active { font-weight: 700; filter: brightness(1.15); opacity: 1; }
 
-    .controls-container { 
-      flex-shrink: 0; 
-      background: rgba(30, 50, 52, 0.95); 
-      padding: 15px; 
-      border-top: 1px solid rgba(255,255,255,0.2); 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .controls-container button {
-      margin: 0;
-    }
+    /* New massive 50/50 Step Buttons at the bottom */
+    .controls-container { flex-shrink: 0; background: rgba(30, 50, 52, 0.95); padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 12px; }
+    .controls-container button { margin: 0; flex: 1; padding: 18px; font-size: 1.2rem; }
 
     /* --- MOBILE APP OVERRIDES --- */
     @media (max-width: 800px) { 
       body { padding: 0; }
-      
-      .container { 
-        max-width: 100%; 
-        width: 100vw; 
-        height: 100vh; 
-        max-height: 100vh; 
-        border-radius: 0; 
-        padding: 12px; 
-      }
-      
+      .container { max-width: 100%; width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; padding: 15px 12px; }
       .stitch-grid { grid-template-columns: 1fr; } 
       .span-2 { grid-column: span 1; } 
 
-      /* Sidebar turns into an off-canvas drawer */
       .sidebar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        background: rgb(25, 45, 47); /* Solid background blocks content */
-        box-shadow: 5px 0 20px rgba(0,0,0,0.7);
-        padding: 20px 15px;
-        z-index: 999;
+        position: absolute; top: 0; left: 0; height: 100%; background: rgb(25, 45, 47); 
+        box-shadow: 5px 0 20px rgba(0,0,0,0.7); padding: 20px 15px; z-index: 100;
       }
+      .sidebar-overlay.active { display: block; }
       
-      .header-bar { font-size: 1.1rem; flex-direction: column; align-items: flex-start; gap: 8px; }
-      .header-left { width: 100%; }
-
-      /* Chunky 2x2 grid for mobile controls */
-      .controls-container { 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 8px; 
-        padding: 12px 0 0 0;
-      }
-      .controls-container button { 
-        width: 100%; 
-        font-size: 0.95rem; 
-        padding: 14px 8px; 
-      }
-      /* Push Step buttons to top row, Row buttons to bottom row */
-      .controls-container button:nth-child(1) { order: 3; } /* Prev Row */
-      .controls-container button:nth-child(2) { order: 1; } /* Prev Step */
-      .controls-container button:nth-child(3) { order: 2; } /* Next Step */
-      .controls-container button:nth-child(4) { order: 4; } /* Next Row */
+      .header-bar { font-size: 1.2rem; margin-bottom: 8px; }
+      .current-row-text { font-size: 0.95rem; }
+      .row-nav-bar { padding-bottom: 12px; margin-bottom: 12px; }
+      .controls-container { padding-top: 12px; }
     }
   </style>
 </head>
 <body>
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar('close')"></div>
 
   <div class="container">
     <div id="setup-ui">
@@ -334,9 +231,18 @@
         <div style="display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px;">
           <h3 id="displayPatternTitle" style="font-size: 1.4rem; margin: 0; line-height: 1.2;">Pattern</h3>
           <div class="sidebar-actions">
-            <button class="sidebar-btn" onclick="undoAction()">↶ Undo</button>
-            <button class="sidebar-btn" onclick="editPattern()">✎ Edit</button>
-            <button class="sidebar-btn danger" onclick="clearProgress()">✖ Reset</button>
+            <button class="sidebar-btn" onclick="undoAction()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+              Undo
+            </button>
+            <button class="sidebar-btn" onclick="editPattern()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit
+            </button>
+            <button class="sidebar-btn danger" onclick="clearProgress()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Reset
+            </button>
           </div>
         </div>
         <div id="sidebarList"></div>
@@ -345,22 +251,36 @@
       <div class="main-content">
         <div class="header-bar">
           <div class="header-left">
-            <button id="sidebarToggle" class="toggle-sidebar-btn" onclick="toggleSidebar()">◀</button>
+            <button id="sidebarToggle" class="toggle-sidebar-btn" onclick="toggleSidebar()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 18l-6-6 6-6z"/></svg>
+            </button>
             <span id="displaySectionTitle" style="font-weight: 700;">Section</span>
           </div>
-          <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
-            <span style="font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px;">⏱ <span id="stitchTimer">0s</span></span>
-            <span style="font-size: 1rem; opacity: 0.8; text-align: right;">Current: <br><strong id="displayRow" class="num">Row 1</strong></span>
+          <div class="header-right">
+            <span class="timer-text">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span id="stitchTimer">0s</span>
+            </span>
+            <span class="current-row-text">Current: <strong id="displayRow" class="num">Row 1</strong></span>
           </div>
+        </div>
+
+        <div class="row-nav-bar">
+          <button class="mini-btn" onclick="jumpRow(-1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Prev Row
+          </button>
+          <button class="mini-btn" onclick="jumpRow(1)">
+            Next Row 
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </div>
 
         <div class="pattern-list" id="patternList"></div>
 
         <div class="controls-container">
-          <button class="secondary minus" onclick="jumpRow(-1)">← Prev Row</button>
           <button class="minus" onclick="changeStitch(-1)">Prev Step</button>
           <button onclick="changeStitch(1)">Next Step</button>
-          <button class="secondary" onclick="jumpRow(1)">Next Row →</button>
         </div>
       </div>
     </div>
@@ -374,7 +294,6 @@
     let currentStepIndex = 0;
     let lastActiveRowIndex = 0;
 
-    // Timer, Audio & Cooldowns
     let lastStitchTime = Date.now();
     let lastActionTime = 0;
     const ACTION_COOLDOWN = 300; 
@@ -433,7 +352,6 @@
       'rep': 'repeat'
     };
 
-    // --- STATE & UNDO MANAGEMENT ---
     function saveForUndo() {
       if (appData.sections.length === 0) return;
       const sectionsCompleted = appData.sections.map(s => s.isCompleted);
@@ -460,9 +378,7 @@
         currentRowIndex = prevState.row;
         currentStepIndex = prevState.step;
         
-        appData.sections.forEach((sec, i) => {
-            sec.isCompleted = prevState.completions[i];
-        });
+        appData.sections.forEach((sec, i) => { sec.isCompleted = prevState.completions[i]; });
 
         playSound('prev'); 
         resetTimer();
@@ -522,12 +438,9 @@
           
           loadSection(currentSectionIndex);
           
-          // If viewing on mobile on load, collapse the sidebar automatically
           if (window.innerWidth <= 800) toggleSidebar('close');
 
-        } catch (e) {
-          console.error("Failed to load saved state", e);
-        }
+        } catch (e) { console.error("Failed to load saved state", e); }
       }
     }
 
@@ -538,7 +451,8 @@
       }
     }
 
-    // --- COLOR HELPERS ---
+    window.onload = loadState;
+
     function getColorHex(colorName) {
       let c = colorName.toLowerCase();
       if (c.includes('light blue') || c.includes('blue')) return '#7abceb';
@@ -558,7 +472,6 @@
       return 'white';
     }
 
-    // --- SETUP LOGIC ---
     function addSectionInput() {
       const container = document.getElementById('sections-container');
       const count = container.children.length + 1;
@@ -571,6 +484,7 @@
     function editPattern() {
       document.getElementById('tracker-ui').style.display = 'none';
       document.getElementById('setup-ui').style.display = 'flex';
+      if (window.innerWidth <= 800) toggleSidebar('close');
     }
 
     function startPattern() {
@@ -578,7 +492,7 @@
       appData.sections = [];
       rawInputs.title = document.getElementById('patternTitle').value;
       rawInputs.sections = [];
-      undoStack = []; // Wipe history on restart
+      undoStack = []; 
       
       document.querySelectorAll('.section-input-block').forEach((block, i) => {
         const rawName = block.querySelector('.section-name-input').value || `Section ${i + 1}`;
@@ -591,9 +505,7 @@
 
         for (let c = 1; c <= copies; c++) {
           let sectionName = rawName;
-          if (copies > 1) {
-            sectionName = rawName.replace(/\([xX]\d+\)|\(\d+[xX]\)/, `(${c})`);
-          }
+          if (copies > 1) { sectionName = rawName.replace(/\([xX]\d+\)|\(\d+[xX]\)/, `(${c})`); }
 
           let defaultColor = 'default';
           let lowerName = rawName.toLowerCase();
@@ -612,15 +524,8 @@
           }
 
           const rows = parsePatternText(rowsText, defaultColor);
-          
           if (rows.length > 0) {
-            appData.sections.push({ 
-              name: sectionName, 
-              rows: JSON.parse(JSON.stringify(rows)), 
-              savedRow: 0, 
-              savedStep: 0, 
-              isCompleted: false 
-            });
+            appData.sections.push({ name: sectionName, rows: JSON.parse(JSON.stringify(rows)), savedRow: 0, savedStep: 0, isCompleted: false });
           }
         }
       });
@@ -639,20 +544,27 @@
 
     function toggleSidebar(forceState) {
       const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
       const btn = document.getElementById('sidebarToggle');
       
       if (forceState === 'close') {
         sidebar.classList.add('collapsed');
+        overlay.classList.remove('active');
       } else if (forceState === 'open') {
         sidebar.classList.remove('collapsed');
+        overlay.classList.add('active');
       } else {
         sidebar.classList.toggle('collapsed');
+        overlay.classList.toggle('active');
       }
       
-      btn.innerText = sidebar.classList.contains('collapsed') ? "▶" : "◀";
+      if (sidebar.classList.contains('collapsed')) {
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6z"/></svg>';
+      } else {
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 18l-6-6 6-6z"/></svg>';
+      }
     }
 
-    // --- PARSER LOGIC ---
     function parsePatternText(text, defaultColor) {
       let rows = [];
       text.split('\n').forEach(line => {
@@ -665,9 +577,7 @@
           let totalRegex = /\s*\(\s*(\d+)\s*\)/g;
           let tMatch;
           let lastMatch = null;
-          while ((tMatch = totalRegex.exec(instructions)) !== null) {
-            lastMatch = tMatch;
-          }
+          while ((tMatch = totalRegex.exec(instructions)) !== null) { lastMatch = tMatch; }
           if (lastMatch) {
             rowTotal = parseInt(lastMatch[1], 10);
             instructions = instructions.substring(0, lastMatch.index) + instructions.substring(lastMatch.index + lastMatch[0].length);
@@ -719,9 +629,7 @@
             } else if (remainder.startsWith(',') || remainder.startsWith('-')) {
               remainder = remainder.substring(1).trim();
             }
-            if (remainder) {
-              subSeq.push(remainder);
-            }
+            if (remainder) subSeq.push(remainder);
           }
         } else {
           let isStitch = false;
@@ -819,10 +727,20 @@
       appData.sections.forEach((sec, i) => {
         const item = document.createElement('div');
         item.className = `sidebar-item ${i === currentSectionIndex ? 'active' : ''} ${sec.isCompleted ? 'completed' : ''}`;
-        item.innerHTML = `<span>${sec.name}</span>${sec.isCompleted ? '<span style="font-size: 0.85rem; color: #81c784;">✓ Done</span>' : ''}`;
+        
+        const textSpan = document.createElement('span');
+        textSpan.innerText = sec.name;
+        item.appendChild(textSpan);
+        
+        if (sec.isCompleted) {
+            const checkSpan = document.createElement('span');
+            checkSpan.style = "font-size: 0.85rem; color: #81c784; display:flex; align-items:center; gap:4px;";
+            checkSpan.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Done';
+            item.appendChild(checkSpan);
+        }
+
         item.onclick = () => {
             loadSection(i);
-            // Auto-close sidebar on mobile after making a selection
             if (window.innerWidth <= 800) toggleSidebar('close');
         };
         list.appendChild(item);
@@ -913,7 +831,6 @@
             lastActionTime = now;
 
             saveForUndo(); 
-            
             uncompleteCurrentSection(); 
             playSound('next');
             resetTimer();
@@ -952,7 +869,13 @@
         block.classList.toggle('active-row', r === currentRowIndex);
         block.classList.toggle('completed-row', r < currentRowIndex);
         
-        badge.innerText = r < currentRowIndex ? "✓ Done" : (r === currentRowIndex ? "▶ Active" : "");
+        if (r < currentRowIndex) {
+            badge.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Done';
+        } else if (r === currentRowIndex) {
+            badge.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom:-1px;"><path d="M8 5v14l11-7z"/></svg> Active';
+        } else {
+            badge.innerHTML = "";
+        }
 
         block.querySelectorAll('.stitch-pill').forEach((pill, s) => {
           const posClass = Array.from(pill.classList).find(c => c.startsWith('position-'));
