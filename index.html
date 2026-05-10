@@ -198,7 +198,8 @@
     .history-header { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; margin-bottom: 2px;}
     .history-boxes { display: flex; gap: 8px; width: 100%; justify-content: center; }
     .history-boxes span { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 6px; font-family: 'Poppins', sans-serif;}
-    .history-arrow { font-size: 1rem; opacity: 0.5; margin-top: 5px; margin-bottom: -1px; display: flex; align-items: center; justify-content: center; }
+    /* Nudged arrow up by 2px */
+    .history-arrow { font-size: 1rem; opacity: 0.5; margin-top: 2px; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; }
 
     /* --- MOBILE APP OVERRIDES --- */
     @media (max-width: 800px) { 
@@ -286,10 +287,8 @@
           <h2 id="displaySectionTitle" class="section-title">Section</h2>
           
           <button id="focusToggleBtn" class="icon-btn" onclick="toggleFocusView()">
-             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-               <circle cx="12" cy="12" r="10"></circle>
-               <line x1="12" y1="16" x2="12" y2="12"></line>
-               <line x1="12" y1="8" x2="12.01" y2="8"></line>
+             <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
              </svg>
           </button>
         </div>
