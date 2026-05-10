@@ -41,7 +41,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
-      height: 90vh; /* Changed from max-height to strictly hold layout */
+      height: 90vh; 
       box-sizing: border-box;
       position: relative;
     }
@@ -147,7 +147,8 @@
     .toggle-sidebar-btn { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; padding: 5px 8px; cursor: pointer; min-width: 35px; box-shadow: none; transform: none; margin: 0;}
     .toggle-sidebar-btn:hover { box-shadow: none; transform: none; background: rgba(255,255,255,0.3); }
 
-    .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
+    /* Added extra bottom padding to create a safe scrolling buffer */
+    .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 10px; padding-bottom: 40px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
 
     .row-block { background: rgba(0, 0, 0, 0.2); border-radius: 8px; margin-bottom: 15px; border: 1px solid transparent; overflow: hidden; transition: border-color 0.3s, background 0.3s; }
     .row-block.active-row { border: 1px solid rgba(255, 215, 0, 0.5); background: rgba(0, 0, 0, 0.4); }
@@ -182,36 +183,22 @@
     .stitch-pill.completed { opacity: 0.3 !important; }
     .stitch-pill.active { font-weight: 700; filter: brightness(1.15); opacity: 1; }
 
-    .controls-container { flex-shrink: 0; background: rgba(30, 50, 52, 0.95); padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 12px; }
+    /* Controls container with increased top padding for a bigger buffer */
+    .controls-container { flex-shrink: 0; background: rgba(30, 50, 52, 0.95); padding: 20px 15px 15px 15px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 12px; }
     .controls-container button { margin: 0; flex: 1; padding: 18px; font-size: 1.2rem; }
 
     /* --- MOBILE APP OVERRIDES --- */
     @media (max-width: 800px) { 
-      html, body {
-        height: 100dvh; /* Dynamic Viewport Height locks out URL bar bounce */
-        overflow: hidden; /* Prevent the entire page from scrolling */
-        padding: 0;
-      }
-      
-      .container { 
-        max-width: 100%; 
-        width: 100vw; 
-        height: 100dvh; 
-        border-radius: 0; 
-        padding: 10px 8px; /* Smidge smaller overall padding */
-      }
+      html, body { height: 100dvh; overflow: hidden; padding: 0; }
+      .container { max-width: 100%; width: 100vw; height: 100dvh; border-radius: 0; padding: 10px 8px; }
       
       .stitch-grid { grid-template-columns: 1fr; padding: 12px 15px; gap: 10px; } 
       .span-2 { grid-column: span 1; } 
 
-      .sidebar {
-        position: absolute; top: 0; left: 0; height: 100%; background: rgb(25, 45, 47); 
-        box-shadow: 5px 0 20px rgba(0,0,0,0.7); padding: 20px 15px; z-index: 100;
-      }
+      .sidebar { position: absolute; top: 0; left: 0; height: 100%; background: rgb(25, 45, 47); box-shadow: 5px 0 20px rgba(0,0,0,0.7); padding: 20px 15px; z-index: 100; }
       .sidebar-overlay { border-radius: 0; }
       .sidebar-overlay.active { display: block; }
       
-      /* Make fonts/gaps a smidge smaller to save space */
       .header-bar { font-size: 1.1rem; margin-bottom: 6px; }
       .current-row-text { font-size: 0.85rem; }
       .timer-text { font-size: 0.75rem; margin-bottom: 0; }
@@ -223,10 +210,11 @@
       .row-title { font-size: 1.05rem; }
       .stitch-pill { font-size: 0.9rem; padding: 6px 10px; }
       
-      .controls-container { padding-top: 8px; gap: 8px; border-top: none; }
+      /* Mobile buffer spacing above the buttons */
+      .controls-container { padding: 16px 5px 10px 5px; gap: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
       .controls-container button { padding: 12px 8px; font-size: 1.1rem; }
       
-      .pattern-list { margin-bottom: 5px; padding-right: 5px; }
+      .pattern-list { margin-bottom: 5px; padding-right: 5px; padding-bottom: 50px; } /* Large scroll buffer on mobile */
     }
   </style>
 </head>
@@ -913,7 +901,9 @@
           
           if (r === currentRowIndex && s === currentStepIndex) {
              pill.closest('.stitch-group').classList.add('has-active');
-             pill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+             
+             // Scroll to center for much better context viewing
+             pill.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         });
       });
