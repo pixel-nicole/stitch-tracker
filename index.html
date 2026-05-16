@@ -14,11 +14,6 @@
   
   <style>
     /* Base Styles */
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
     body {
       background-image: url(knitted-green.jpg); 
       background-size: cover; 
@@ -26,8 +21,8 @@
       color: white; 
       font-family: 'Poppins', sans-serif; 
       text-align: center; 
+      margin: 0;
       padding: 30px 20px;
-      box-sizing: border-box;
     }
 
     .container {
@@ -41,7 +36,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
-      height: 90vh; 
+      max-height: 90vh; 
       box-sizing: border-box;
       position: relative;
     }
@@ -101,6 +96,7 @@
     .sidebar { width: 250px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px; transition: all 0.3s ease; overflow-y: auto; text-align: left; z-index: 100;}
     .sidebar.collapsed { width: 0; padding: 0; margin: 0; border: none; opacity: 0; overflow: hidden; }
 
+    /* Overlay for clicking out of the sidebar on mobile */
     .sidebar-overlay {
       display: none;
       position: absolute;
@@ -129,24 +125,25 @@
 
     .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
     
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-shrink: 0; }
-    .section-title { font-size: 1.5rem; margin: 0; font-weight: 700; flex-grow: 1; text-align: center;}
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 1.5rem; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
     
-    .icon-btn { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; width: 40px; height: 40px; cursor: pointer; box-shadow: none; transform: none; margin: 0; transition: background 0.2s ease; font-size: 1.3rem;}
-    .icon-btn:hover { background: rgba(255,255,255,0.3); box-shadow: none; transform: none; }
-    .icon-btn.active { background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); }
+    .timer-text { font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;}
+    .current-row-text { font-size: 1.1rem; opacity: 0.8; }
 
-    .row-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
-    .current-row-text { font-size: 1.1rem; opacity: 0.9; }
-    
+    .row-nav-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); }
     .mini-btn {
       background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
-      padding: 8px 16px; font-size: 0.95rem; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: 400;
+      padding: 6px 12px; font-size: 0.9rem; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .mini-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
 
-    .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 10px; padding-bottom: 40px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
+    .toggle-sidebar-btn { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; padding: 5px 8px; cursor: pointer; min-width: 35px; box-shadow: none; transform: none; margin: 0;}
+    .toggle-sidebar-btn:hover { box-shadow: none; transform: none; background: rgba(255,255,255,0.3); }
+
+    .pattern-list { flex-grow: 1; overflow-y: auto; text-align: left; padding-right: 15px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
 
     .row-block { background: rgba(0, 0, 0, 0.2); border-radius: 8px; margin-bottom: 15px; border: 1px solid transparent; overflow: hidden; transition: border-color 0.3s, background 0.3s; }
     .row-block.active-row { border: 1px solid rgba(255, 215, 0, 0.5); background: rgba(0, 0, 0, 0.4); }
@@ -181,53 +178,27 @@
     .stitch-pill.completed { opacity: 0.3 !important; }
     .stitch-pill.active { font-weight: 700; filter: brightness(1.15); opacity: 1; }
 
-    /* Controls Container */
-    .controls-container { flex-shrink: 0; background: rgba(30, 50, 52, 0.95); padding: 15px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; gap: 8px; border-radius: 0 0 12px 12px; }
-    
-    .timers-row { display: flex; justify-content: space-between; width: 100%; font-size: 0.85rem; opacity: 0.7; padding: 0 4px; box-sizing: border-box; font-family: 'Poppins', sans-serif;}
-    .timer-left { display: flex; align-items: center; gap: 6px; visibility: hidden; } 
-    .timer-right { display: flex; align-items: center; gap: 6px; }
-    
-    .step-buttons-row { display: flex; gap: 12px; width: 100%; }
-    .step-buttons-row button { margin: 0; flex: 1; padding: 18px; font-size: 1.2rem; }
-
-    /* Action History Log */
-    .action-history-row { display: flex; width: 100%; gap: 15px; margin-top: 5px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.15); }
-    .history-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.8rem; }
-    .history-col.faded { opacity: 0.55; }
-    .history-header { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; margin-bottom: 2px;}
-    .history-boxes { display: flex; gap: 8px; width: 100%; justify-content: center; }
-    .history-boxes span { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 6px; font-family: 'Poppins', sans-serif;}
-    .history-arrow { font-size: 1rem; opacity: 0.5; margin-top: 5px; margin-bottom: -1px; display: flex; align-items: center; justify-content: center; }
+    .controls-container { flex-shrink: 0; background: rgba(30, 50, 52, 0.95); padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; gap: 12px; }
+    .controls-container button { margin: 0; flex: 1; padding: 18px; font-size: 1.2rem; }
 
     /* --- MOBILE APP OVERRIDES --- */
     @media (max-width: 800px) { 
-      html, body { height: 100dvh; overflow: hidden; padding: 0; }
-      .container { max-width: 100%; width: 100vw; height: 100dvh; border-radius: 0; padding: 10px 8px 0 8px; }
-      
-      .stitch-grid { grid-template-columns: 1fr; padding: 12px 15px; gap: 10px; } 
+      body { padding: 0; }
+      .container { max-width: 100%; width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; padding: 15px 12px; }
+      .stitch-grid { grid-template-columns: 1fr; } 
       .span-2 { grid-column: span 1; } 
 
-      .sidebar { position: absolute; top: 0; left: 0; height: 100%; background: rgb(25, 45, 47); box-shadow: 5px 0 20px rgba(0,0,0,0.7); padding: 20px 15px; z-index: 100; }
+      .sidebar {
+        position: absolute; top: 0; left: 0; height: 100%; background: rgb(25, 45, 47); 
+        box-shadow: 5px 0 20px rgba(0,0,0,0.7); padding: 20px 15px; z-index: 100;
+      }
       .sidebar-overlay { border-radius: 0; }
       .sidebar-overlay.active { display: block; }
       
-      .header-top { margin-bottom: 10px; }
-      .section-title { font-size: 1.35rem; }
+      .header-bar { font-size: 1.2rem; margin-bottom: 8px; }
       .current-row-text { font-size: 0.95rem; }
-      
-      .row-nav-bar { padding-bottom: 10px; margin-bottom: 10px; }
-      .mini-btn { font-size: 0.85rem; padding: 6px 12px; }
-      
-      .row-header { padding: 10px 12px; }
-      .row-title { font-size: 1.05rem; }
-      .stitch-pill { font-size: 0.9rem; padding: 6px 10px; }
-      
-      .controls-container { padding: 12px 8px 25px 8px; gap: 8px; border-radius: 0; margin-left: -8px; margin-right: -8px; }
-      .step-buttons-row button { padding: 14px 8px; font-size: 1.1rem; }
-      .timers-row { font-size: 0.75rem; margin-bottom: -2px;}
-      
-      .pattern-list { margin-bottom: 0; padding-right: 5px; padding-bottom: 40px; } 
+      .row-nav-bar { padding-bottom: 12px; margin-bottom: 12px; }
+      .controls-container { padding-top: 12px; }
     }
   </style>
 </head>
@@ -255,7 +226,6 @@
     </div>
 
     <div id="tracker-ui">
-      
       <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar('close')"></div>
       
       <div class="sidebar" id="sidebar">
@@ -280,14 +250,20 @@
       </div>
 
       <div class="main-content">
-        <div class="header-top">
-          <button id="sidebarToggle" class="icon-btn" onclick="toggleSidebar()">&#x25C0;&#xFE0E;</button>
-          
-          <h2 id="displaySectionTitle" class="section-title">Section</h2>
-          
-          <button id="focusToggleBtn" class="icon-btn" onclick="toggleFocusView()">
-             &#x24D8;&#xFE0E;
-          </button>
+        <div class="header-bar">
+          <div class="header-left">
+            <button id="sidebarToggle" class="toggle-sidebar-btn" onclick="toggleSidebar()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 18l-6-6 6-6z"/></svg>
+            </button>
+            <span id="displaySectionTitle" style="font-weight: 700;">Section</span>
+          </div>
+          <div class="header-right">
+            <span class="timer-text">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span id="stitchTimer">0s</span>
+            </span>
+            <span class="current-row-text">Current: <strong id="displayRow" class="num">Row 1</strong></span>
+          </div>
         </div>
 
         <div class="row-nav-bar">
@@ -295,7 +271,6 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Prev Row
           </button>
-          <span class="current-row-text">Current: <strong id="displayRow" class="num">Row 1</strong></span>
           <button class="mini-btn" onclick="jumpRow(1)">
             Next Row 
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -305,24 +280,8 @@
         <div class="pattern-list" id="patternList"></div>
 
         <div class="controls-container">
-          <div class="timers-row">
-            <span class="timer-left" id="timerLeftContainer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span id="stitchTimerLeft">0s</span>
-            </span>
-            <span class="timer-right">
-              <span id="stitchTimerRight">0s</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </span>
-          </div>
-          
-          <div class="step-buttons-row">
-             <button class="minus" onclick="changeStitch(-1)">Prev Step</button>
-             <button onclick="changeStitch(1)">Next Step</button>
-          </div>
-
-          <div class="action-history-row" id="actionHistoryRow" style="display: none;">
-             </div>
+          <button class="minus" onclick="changeStitch(-1)">Prev Step</button>
+          <button onclick="changeStitch(1)">Next Step</button>
         </div>
       </div>
     </div>
@@ -336,17 +295,13 @@
     let currentStepIndex = 0;
     let lastActiveRowIndex = 0;
 
-    // Preferences & Audio
-    let isFocusView = false;
+    let lastStitchTime = Date.now();
     let lastActionTime = 0;
     const ACTION_COOLDOWN = 300; 
 
     const sfxNext = new Audio('next-sfx.mp3');
     const sfxPrev = new Audio('prev-sfx.mp3');
-
-    // Advanced History Engine for Timers and Logs
-    let actionHistory = []; // { name, from: {row, step}, to: {row, step}, timestamp }
-    let undoStack = []; // Pure state backups for Undo functionality
+    let undoStack = [];
 
     function playSound(type) {
       try {
@@ -357,123 +312,23 @@
           sfxPrev.currentTime = 0;
           sfxPrev.play();
         }
-      } catch(e) { console.log('Audio playback issue:', e); }
+      } catch(e) {
+        console.log('Audio playback issue:', e);
+      }
     }
 
-    function formatTime(totalSeconds) {
-      if(totalSeconds < 0) return "0s";
-      let m = Math.floor(totalSeconds / 60);
-      let s = totalSeconds % 60;
-      return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    function resetTimer() {
+      lastStitchTime = Date.now();
     }
 
     setInterval(() => {
-      const now = Date.now();
-      if (actionHistory.length > 0) {
-        let diffRight = Math.floor((now - actionHistory[0].timestamp) / 1000);
-        document.getElementById('stitchTimerRight').innerText = formatTime(diffRight);
-      }
-      
-      if (actionHistory.length > 1) {
-        document.getElementById('timerLeftContainer').style.visibility = 'visible';
-        let diffLeft = Math.floor((now - actionHistory[1].timestamp) / 1000);
-        document.getElementById('stitchTimerLeft').innerText = formatTime(diffLeft);
-      } else {
-        document.getElementById('timerLeftContainer').style.visibility = 'hidden';
-      }
+      let diff = Math.floor((Date.now() - lastStitchTime) / 1000);
+      let m = Math.floor(diff / 60);
+      let s = diff % 60;
+      let timeString = m > 0 ? `${m}m ${s}s` : `${s}s`;
+      let timerEl = document.getElementById('stitchTimer');
+      if (timerEl) timerEl.innerText = timeString;
     }, 1000);
-
-    function recordAction(actionName, fromRow, fromStep, toRow, toStep) {
-       actionHistory.unshift({
-           name: actionName,
-           from: { row: fromRow, step: fromStep },
-           to: { row: toRow, step: toStep },
-           timestamp: Date.now()
-       });
-       if (actionHistory.length > 5) actionHistory.pop();
-       renderActionHistory();
-       saveState();
-    }
-
-    // Helper for formatting the Unicode action descriptions
-    function getActionString(name, side) {
-       let icon = '';
-       if (name === "Next Step") icon = "→";
-       else if (name === "Prev Step") icon = "←";
-       else if (name === "Next Row") icon = "⇢";
-       else if (name === "Prev Row") icon = "⇠";
-       else icon = "⇣"; // Jump to step / Undo
-
-       if (side === 'left') return `${icon} ${name.toUpperCase()}`;
-       return `${name.toUpperCase()} ${icon}`;
-    }
-
-    function renderActionHistory() {
-      const row = document.getElementById('actionHistoryRow');
-      if (actionHistory.length === 0) {
-          row.innerHTML = '';
-          return;
-      }
-
-      let html = '';
-
-      // Left Column: 2nd Most Recent Action (Faded)
-      if (actionHistory.length > 1) {
-          let act2 = actionHistory[1];
-          html += `
-          <div class="history-col faded">
-              <div class="history-header">${getActionString(act2.name, 'left')}</div>
-              <div class="history-boxes">
-                  <span>Row ${act2.from.row + 1}</span>
-                  <span>Step ${act2.from.step + 1}</span>
-              </div>
-              <div class="history-arrow">
-                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-              </div>
-              <div class="history-boxes">
-                  <span>Row ${act2.to.row + 1}</span>
-                  <span>Step ${act2.to.step + 1}</span>
-              </div>
-          </div>`;
-      } else {
-          html += `<div class="history-col faded"></div>`; 
-      }
-
-      // Right Column: Most Recent Action
-      let act1 = actionHistory[0];
-      html += `
-      <div class="history-col">
-          <div class="history-header">${getActionString(act1.name, 'right')}</div>
-          <div class="history-boxes">
-              <span>Row ${act1.from.row + 1}</span>
-              <span>Step ${act1.from.step + 1}</span>
-          </div>
-          <div class="history-arrow">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-          </div>
-          <div class="history-boxes">
-              <span>Row ${act1.to.row + 1}</span>
-              <span>Step ${act1.to.step + 1}</span>
-          </div>
-      </div>`;
-
-      row.innerHTML = html;
-    }
-
-    function toggleFocusView() {
-       isFocusView = !isFocusView;
-       const btn = document.getElementById('focusToggleBtn');
-       const historyRow = document.getElementById('actionHistoryRow');
-       
-       if (isFocusView) {
-           btn.classList.add('active');
-           historyRow.style.display = 'flex';
-       } else {
-           btn.classList.remove('active');
-           historyRow.style.display = 'none';
-       }
-       saveState();
-    }
 
     const stitchDefinitions = { 
       'inc': ['Increase (1st st)', 'Increase (2nd st)'], 'dec': ['Decrease (1st loop)', 'Decrease (2nd loop)'], 
@@ -482,10 +337,20 @@
     };
 
     const abbreviationMap = {
-      'slst': 'Slip Stitch', 'sl st': 'Slip Stitch', 'sc': 'Single Crochet',
-      'hdc': 'Half Double Crochet', 'dc': 'Double Crochet', 'inc': 'Increase',
-      'dec': 'Decrease', 'ch': 'Chain', 'st': 'stitch', 'sts': 'stitches',
-      'fo': 'Fasten Off', 'rnd': 'round', 'rnds': 'rounds', 'rep': 'repeat'
+      'slst': 'Slip Stitch',
+      'sl st': 'Slip Stitch',
+      'sc': 'Single Crochet',
+      'hdc': 'Half Double Crochet',
+      'dc': 'Double Crochet',
+      'inc': 'Increase',
+      'dec': 'Decrease',
+      'ch': 'Chain',
+      'st': 'stitch',
+      'sts': 'stitches',
+      'fo': 'Fasten Off',
+      'rnd': 'round',
+      'rnds': 'rounds',
+      'rep': 'repeat'
     };
 
     function saveForUndo() {
@@ -510,9 +375,6 @@
       if (undoStack.length > 0) {
         const prevState = undoStack.pop();
         
-        let oldRow = currentRowIndex;
-        let oldStep = currentStepIndex;
-
         currentSectionIndex = prevState.section;
         currentRowIndex = prevState.row;
         currentStepIndex = prevState.step;
@@ -520,7 +382,7 @@
         appData.sections.forEach((sec, i) => { sec.isCompleted = prevState.completions[i]; });
 
         playSound('prev'); 
-        recordAction("Undo", oldRow, oldStep, currentRowIndex, currentStepIndex);
+        resetTimer();
 
         renderSidebar();
         renderPatternList();
@@ -542,8 +404,7 @@
         currentSectionIndex: currentSectionIndex,
         currentRowIndex: currentRowIndex,
         currentStepIndex: currentStepIndex,
-        actionHistory: actionHistory,
-        isFocusView: isFocusView
+        lastStitchTime: lastStitchTime
       };
       localStorage.setItem('crochetTrackerProgress', JSON.stringify(state));
     }
@@ -558,16 +419,7 @@
           currentSectionIndex = state.currentSectionIndex;
           currentRowIndex = state.currentRowIndex;
           currentStepIndex = state.currentStepIndex;
-          
-          actionHistory = state.actionHistory || [];
-          isFocusView = state.isFocusView || false;
-          
-          if (isFocusView) {
-             document.getElementById('focusToggleBtn').classList.add('active');
-             document.getElementById('actionHistoryRow').style.display = 'flex';
-          }
-          
-          renderActionHistory();
+          lastStitchTime = state.lastStitchTime || Date.now();
           
           document.getElementById('patternTitle').value = rawInputs.title;
           const container = document.getElementById('sections-container');
@@ -586,6 +438,7 @@
           document.getElementById('displayPatternTitle').innerText = appData.title;
           
           loadSection(currentSectionIndex);
+          
           if (window.innerWidth <= 800) toggleSidebar('close');
 
         } catch (e) { console.error("Failed to load saved state", e); }
@@ -641,7 +494,6 @@
       rawInputs.title = document.getElementById('patternTitle').value;
       rawInputs.sections = [];
       undoStack = []; 
-      actionHistory = []; 
       
       document.querySelectorAll('.section-input-block').forEach((block, i) => {
         const rawName = block.querySelector('.section-name-input').value || `Section ${i + 1}`;
@@ -685,7 +537,7 @@
       document.getElementById('tracker-ui').style.display = 'flex';
       document.getElementById('displayPatternTitle').innerText = appData.title;
       
-      renderActionHistory();
+      resetTimer();
       loadSection(0);
       
       if (window.innerWidth <= 800) toggleSidebar('close');
@@ -707,11 +559,10 @@
         overlay.classList.toggle('active');
       }
       
-      // Use text variation selector &#xFE0E; to prevent iOS from making it a blue emoji play button
       if (sidebar.classList.contains('collapsed')) {
-        btn.innerHTML = '&#x25B6;&#xFE0E;';
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6z"/></svg>';
       } else {
-        btn.innerHTML = '&#x25C0;&#xFE0E;';
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 18l-6-6 6-6z"/></svg>';
       }
     }
 
@@ -983,14 +834,10 @@
             saveForUndo(); 
             uncompleteCurrentSection(); 
             playSound('next');
-            
-            let oldRow = currentRowIndex;
-            let oldStep = currentStepIndex;
+            resetTimer();
 
             currentRowIndex = rIndex;
             currentStepIndex = sIndex;
-            
-            recordAction("Jump to Step", oldRow, oldStep, currentRowIndex, currentStepIndex);
             updateFocus();
           };
 
@@ -1038,8 +885,7 @@
           
           if (r === currentRowIndex && s === currentStepIndex) {
              pill.closest('.stitch-group').classList.add('has-active');
-             
-             pill.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             pill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
         });
       });
@@ -1068,9 +914,7 @@
       } else {
         playSound('next');
       }
-
-      let oldRow = currentRowIndex;
-      let oldStep = currentStepIndex;
+      resetTimer();
 
       currentStepIndex += dir;
       const sec = appData.sections[currentSectionIndex];
@@ -1087,7 +931,6 @@
           
           if (currentSectionIndex < appData.sections.length - 1) {
              if(confirm("Section complete! Move to the next section?")) {
-               recordAction(dir > 0 ? "Next Step" : "Prev Step", oldRow, oldStep, currentRowIndex, currentStepIndex);
                loadSection(currentSectionIndex + 1);
                return; 
              }
@@ -1104,8 +947,6 @@
           currentStepIndex = 0; 
         }
       }
-      
-      recordAction(dir > 0 ? "Next Step" : "Prev Step", oldRow, oldStep, currentRowIndex, currentStepIndex);
       updateFocus();
     }
 
@@ -1118,9 +959,7 @@
 
       if (dir < 0) playSound('prev');
       else playSound('next');
-
-      let oldRow = currentRowIndex;
-      let oldStep = currentStepIndex;
+      resetTimer();
 
       uncompleteCurrentSection();
       currentRowIndex += dir;
@@ -1130,8 +969,6 @@
       if (currentRowIndex >= sec.rows.length) currentRowIndex = sec.rows.length - 1;
       
       currentStepIndex = 0; 
-      
-      recordAction(dir > 0 ? "Next Row" : "Prev Row", oldRow, oldStep, currentRowIndex, currentStepIndex);
       updateFocus();
     }
 
