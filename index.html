@@ -498,7 +498,6 @@
        saveState();
     }
 
-    // UPDATED to make 'dec' just generate a single step.
     const stitchDefinitions = { 
       'inc': ['Increase (1st st)', 'Increase (2nd st)'], 'dec': ['Decrease'], 
       'sc': ['Single Crochet'], 'slst': ['Slip Stitch'], 'sl st': ['Slip Stitch'], 
@@ -1003,7 +1002,12 @@
           stepNum.innerText = `${sIndex + 1}.`;
 
           pill.appendChild(stepNum);
-          pill.appendChild(document.createTextNode(stepObj.text));
+          
+          // Wrap text in a span and replace space before '(' with a line break
+          const textContainer = document.createElement('span');
+          textContainer.innerHTML = stepObj.text.replace(/ \(/g, '<br>(');
+          textContainer.style.lineHeight = "1.2";
+          pill.appendChild(textContainer);
           
           pill.onclick = (e) => {
             e.stopPropagation(); 
