@@ -479,10 +479,17 @@
     const stitchDefinitions = { 
       'inc': ['Increase (1st st)', 'Increase (2nd st)'], 'dec': ['Decrease'], 
       'sc': ['Single Crochet'], 'slst': ['Slip Stitch'], 'sl st': ['Slip Stitch'], 
-      'ch': ['Chain'], 'magic circle': ['Magic Circle Setup'], 'dc': ['Double Crochet'], 'hdc': ['Half Double Crochet']
+      'ch': ['Chain'], 'magic circle': ['Magic Circle Setup'], 'mr': ['Magic Ring Setup'], 'dc': ['Double Crochet'], 'hdc': ['Half Double Crochet'],
+      'bo': ['Bobble (1st DC)', 'Bobble (2nd DC)', 'Bobble (3rd DC)', 'Bobble (4th DC)'],
+      'cc': ['Colour Change'],
+      'blo': ['Back Loop Only'],
+      'flo': ['Front Loop Only'],
+      'fo': ['Fasten Off']
     };
 
     const abbreviationMap = {
+      'mr': 'Magic Ring', 'bo': 'Bobble Stitch', 'cc': 'Colour Change',
+      'blo': 'Back Loop Only', 'flo': 'Front Loop Only',
       'slst': 'Slip Stitch', 'sl st': 'Slip Stitch', 'sc': 'Single Crochet',
       'hdc': 'Half Double Crochet', 'dc': 'Double Crochet', 'inc': 'Increase',
       'dec': 'Decrease', 'ch': 'Chain', 'st': 'stitch', 'sts': 'stitches',
@@ -749,7 +756,7 @@
         let arr = [];
         for(let i=0; i<parseInt(m); i++) arr.push(group); 
         return arr.join(' / '); 
-      });
+      }).replace(/:/g, '');
 
       let parts = expandedInst.split(/\s*\/\s*(?![^()]*\))/g);
       
